@@ -86,7 +86,7 @@ class SipServer:
                     elif dut_port not in self.register:
                         continue
                     if method == 'INFO':
-                        cur_call.send_message('200_info')
+                        cur_call.send_message('200')
                         continue
                     elif method == 'OPTION':
                         continue

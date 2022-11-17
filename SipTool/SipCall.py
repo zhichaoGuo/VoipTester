@@ -20,6 +20,7 @@ class SipCall:
         self.cur_message = message
 
     def send_message(self, method: str):
+        print('send [ %s ] message'% method)
         self._send(self.sip_message.gen_message(self,method))
 
     def _send(self, buf):

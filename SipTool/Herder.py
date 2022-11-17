@@ -105,10 +105,11 @@ class From(HeaderLine):
         super().__init__(buf)
         # print('From:%s'%buf)
         try:  # From: <sip:1501@10.20.0.14:5060;transport=UDP>;tag=bc697b1b6499ea1;epid=DP1e6e6d
-            re_tpl = r'<sip:(?P<account>.+)@(?P<ip>.+):(?P<port>[0-9]{1,6});transport=UDP>;tag=(?P<tag>.+);epid=(?P<epid>.+)'
+            re_tpl = r'<sip:(?P<account>.+)@(?P<ip>.+):(?P<port>[0-9]{1,6});transport=(?P<transport>.+)>;tag=(?P<tag>.+);epid=(?P<epid>.+)'
             self.account = re.search(re_tpl, buf.strip(), re.U).groupdict()['account']
             self.ip = re.search(re_tpl, buf.strip(), re.U).groupdict()['ip']
             self.port = re.search(re_tpl, buf.strip(), re.U).groupdict()['port']
+            self.transport = re.search(re_tpl, buf.strip(), re.U).groupdict()['transport']
             self.tag = re.search(re_tpl, buf.strip(), re.U).groupdict()['tag']
             self.epid = re.search(re_tpl, buf.strip(), re.U).groupdict()['epid']
         except Exception:
@@ -117,6 +118,7 @@ class From(HeaderLine):
                 self.account = re.search(re_tpl, buf.strip(), re.U).groupdict()['account']
                 self.ip = re.search(re_tpl, buf.strip(), re.U).groupdict()['ip']
                 self.port = re.search(re_tpl, buf.strip(), re.U).groupdict()['port']
+                self.transport = None
                 self.tag = re.search(re_tpl, buf.strip(), re.U).groupdict()['tag']
                 self.epid = re.search(re_tpl, buf.strip(), re.U).groupdict()['epid']
             except Exception:
@@ -125,6 +127,7 @@ class From(HeaderLine):
                     self.account = re.search(re_tpl, buf.strip(), re.U).groupdict()['account']
                     self.ip = re.search(re_tpl, buf.strip(), re.U).groupdict()['ip']
                     self.port = re.search(re_tpl, buf.strip(), re.U).groupdict()['port']
+                    self.transport = None
                     self.tag = re.search(re_tpl, buf.strip(), re.U).groupdict()['tag']
                     self.epid = None
                 except Exception:
@@ -134,6 +137,7 @@ class From(HeaderLine):
                         self.account = re.search(re_tpl, buf.strip(), re.U).groupdict()['account']
                         self.ip = re.search(re_tpl, buf.strip(), re.U).groupdict()['ip']
                         self.port = None
+                        self.transport = None
                         self.tag = re.search(re_tpl, buf.strip(), re.U).groupdict()['tag']
                         self.epid = re.search(re_tpl, buf.strip(), re.U).groupdict()['epid']
                     except Exception:
@@ -142,12 +146,15 @@ class From(HeaderLine):
                             self.account = re.search(re_tpl, buf.strip(), re.U).groupdict()['account']
                             self.ip = re.search(re_tpl, buf.strip(), re.U).groupdict()['ip']
                             self.port = None
+                            self.transport = None
                             self.tag = re.search(re_tpl, buf.strip(), re.U).groupdict()['tag']
                             self.epid = None
                         except Exception:
                             print('parse From header err!!')
                             self.account = None
                             self.ip = None
+                            self.port = None
+                            self.transport = None
                             self.tag = None
                             self.epid = None
 

@@ -1,10 +1,11 @@
 import re
 
-# Todo  整合sip body 和 sdp body
+
 class Body:
     def __init__(self, buf: str):
         sdp_list = buf.split('\r\n')
         body_a_list = []
+        body_b_list = []
         for sdp_line in sdp_list:
             if sdp_line == '':  # skip '' line
                 continue
@@ -21,8 +22,8 @@ class Body:
             #     self.e=Body_e(option)
             # elif method == 'p':
             #     self.p=Body_p(option)
-            # elif method == 'b':
-            #     self.b=Body_b(option)
+            elif method == 'b':
+                body_b_list.append(option)
             # elif method == 'z':
             #     self.z=Body_z(option)
             # elif method == 'k':
@@ -33,13 +34,16 @@ class Body:
                 self.c = Body_c(option)
             elif method == 't':
                 self.t = Body_t(option)
-            elif method == 'm':
-                self.m = Body_m(option)
+            elif (method == 'm') and ('audio' in option):
+                self.m_audio = Body_m(option)
+            elif (method == 'm') and ('video' in option):
+                self.m_video = Body_m(option)
             elif method == 'a':
                 body_a_list.append(option)
             else:
                 print('can not match sdp body %s' % method)
         self.a = Body_a(body_a_list)
+        self.b = Body_b(body_b_list)
 
 
 class BodyBase:
@@ -131,11 +135,17 @@ class Body_b(BodyBase):
     """
     zero or more bandwidth information lines
     带宽信息
+    eg: b=AS:2098
     """
 
-    def __init__(self, buf):
-        super().__init__(buf)
-        pass
+    def __init__(self, b_list:list):
+        super().__init__(b_list)
+
+    def __str__(self):
+        buf = ''
+        for b in self.buf:
+            buf += f'b={b}\r\n'
+        return buf
 
 
 class Body_z(BodyBase):

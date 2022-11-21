@@ -1,3 +1,5 @@
+import queue
+
 from SipTool.MessageParser import SipMessage
 from socket import socket
 
@@ -15,9 +17,14 @@ class SipCall:
         self.server_info = server_info
         self.remote_ip = message.headers.Via.ip
         self.remote_port = message.headers.Via.port
+        self.history_message = queue.Queue()
 
     def put(self, message: SipMessage):
+        self.history_message.put(self.cur_message)
         self.cur_message = message
+
+    def rev_message(self,method):  # Todo 完善rev机制
+        pass
 
     def send_message(self, method: str):
         print('send [ %s ] message'% method)

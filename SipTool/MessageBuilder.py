@@ -40,7 +40,7 @@ class SipMessageBuilder:
         self.buf += f';epid={_from.epid}' if _from.epid else ''
         self.buf += '\r\n'
 
-    def add_To(self, _to: To, tag=''):
+    def add_To(self, _to: To, tag=''):  # Todo 完善tag机制
         self.buf += 'To: <sip:'
         self.buf += f'{_to.account}' if _to.account else ''
         self.buf += f'@{_to.ip}' if _to.ip else ''

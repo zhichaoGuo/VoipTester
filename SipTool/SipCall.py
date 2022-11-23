@@ -1,9 +1,9 @@
 import queue
 
-from SipTool.BaseServer import ServerInfo
 from SipTool.MessageParser import SipMessage
 from socket import socket
 
+from SipTool.ServerInfo import ServerInfo
 from SipTool.SipMessage import Message3cx
 
 

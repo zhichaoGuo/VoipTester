@@ -1,8 +1,8 @@
 from socket import socket
 
-from SipTool.BaseServer import ServerInfo
 from SipTool.MessageParser import SipMessage
 from SipTool.Register import Register
+from SipTool.ServerInfo import ServerInfo
 from SipTool.SipCall import SipCall
 from SipTool.SipMessage import Message3cx
 
@@ -20,9 +20,10 @@ class CallInfoManger:
         self.all_call_id = set()
 
     def make_call(self, aim_account: str, use_account: str) -> SipCall:  # Todo: make a new call
-        msg = Message3cx().gen_invite_message(aim_account, use_account, self.server_info)
-        cur_call = SipCall(self.socket, msg, self.server_info,self.register.query(aim_account))
-        self.socket.sendto(msg.encode('utf-8'), (self.server_info.remote_ip,))
+        remote_port = self.register.query(aim_account)
+        msg = Message3cx().gen_invite_message(aim_account, use_account, self.server_info,remote_port)
+        cur_call = SipCall(self.socket, msg, self.server_info,remote_port)
+        self.socket.sendto(msg.encode('utf-8'), (self.server_info.remote_ip,remote_port))
         return cur_call
 
     def get_call(self, cur_message: SipMessage, remote_port: int) -> SipCall:

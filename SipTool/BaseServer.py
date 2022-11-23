@@ -8,6 +8,7 @@ from SipTool.CallInfoManger import CallInfoManger
 from SipTool.MessageParser import SipMessage
 from SipTool.Register import Register
 from SipTool.RtpThread import RtpThread
+from SipTool.ServerInfo import ServerInfo
 from SipTool.SipCall import SipCall
 from SipTool.common.UniqueQueue import UniqueQueue
 
@@ -112,7 +113,7 @@ class SipServer:
                         pass
                     elif method == '200':
                         if cur_message.headers.CSeq.method == 'INVITE':
-                            cur_call.send_message('ack_invite')
+                            cur_call.send_message('ACK')
                     elif method == '302':
                         cur_call.send_message('ack_invite')
                     elif method == '486':
@@ -122,7 +123,7 @@ class SipServer:
                     elif method == 'CANCEL':
                         cur_call.send_message('200')
                     elif method == 'BYE':
-                        cur_call.send_message('200_bye')
+                        cur_call.send_message('200')
                     elif method == 'REFER':
                         cur_call.send_message('202')
                         cur_call.send_message('notify_trying')
@@ -133,14 +134,6 @@ class SipServer:
             return False
         return self.call_manger.make_call(aim_account, use_account)
 
-
-class ServerInfo:
-    def __init__(self, remote_ip: str, host_ip: str, sip_port: int, audio_port: int, video_port: int):
-        self.remote_ip = remote_ip
-        self.host_ip = host_ip
-        self.sip_port = sip_port
-        self.audio_port = audio_port
-        self.video_port = video_port
 
 
 class AllCallDict:
@@ -165,5 +158,6 @@ if __name__ == '__main__':
     remote_ip = '10.20.1.6'
     remote_port = 5060
     server = SipServer(host_ip, host_sip_port, host_audio_port, host_video_port, remote_ip, remote_port)
-    server.call_manger.make_call('1501', '998')
+    time.sleep(5)
+    server.call_manger.make_call('1502', '998')
     time.sleep(100)

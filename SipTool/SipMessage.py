@@ -1,8 +1,8 @@
 import time
 
-from SipTool.BaseServer import ServerInfo
 from SipTool.MessageBuilder import SipMessageBuilder, SipBodyBuilder
 from SipTool import SipCall
+from SipTool.ServerInfo import ServerInfo
 from SipTool.common.Utils import gen_tag, gen_branch, gen_epid, gen_call_id
 
 
@@ -16,7 +16,7 @@ class Message3cx:
         self.msg = None
         self.body = None
 
-    def gen_invite_message(self, aim_account: str, use_account: str,server_info:ServerInfo):
+    def gen_invite_message(self, aim_account: str, use_account: str, server_info: ServerInfo, remote_port):
         self.body = SipBodyBuilder()
         self.body.add_v('0')
         self.body.add_o(f'3cxPS {int(time.time())} {int(time.time())} IN IP4 {server_info.host_ip}')
@@ -31,16 +31,19 @@ class Message3cx:
         self.body.add_a('sendrecv')
 
         self.msg = SipMessageBuilder()
-        self.msg.add_state_line_request('INVITE')
-        self.msg.add_header('Via',f'SIP/2.0/UDP {server_info.host_ip}:{server_info.sip_port};branch={gen_branch()};rport')
+        self.msg.add_state_line_request('INVITE', account=aim_account, ip=server_info.remote_ip, port=remote_port)
+        self.msg.add_header('Via',
+                            f'SIP/2.0/UDP {server_info.host_ip}:{server_info.sip_port};branch={gen_branch()};rport')
         self.msg.add_MaxForwards('70')
         self.msg.add_Contact(f'<sip:{use_account}@{server_info.host_ip}:{server_info.sip_port}>')
-        self.msg.add_header('To',f'<sip:{aim_account}@{server_info.host_ip}>')
-        self.msg.add_header('From',f'<sip:{use_account}@{server_info.host_ip}:{server_info.sip_port}>;tag={gen_tag()};epid={gen_epid()}')
+        self.msg.add_header('To', f'<sip:{aim_account}@{server_info.host_ip}>')
+        self.msg.add_header('From',
+                            f'<sip:{use_account}@{server_info.host_ip}:{server_info.sip_port}>;tag={gen_tag()};epid={gen_epid()}')
         self.msg.add_CallId(gen_call_id())
-        self.msg.add_CSeq(self.call.cur_message.headers.CSeq)
+        self.msg.add_CSeq('1 INVITE')
         self.msg.add_Subject()
-        self.msg.add_Allow('INVITE, ACK, CANCEL, OPTIONS, BYE, REGISTER, SUBSCRIBE, NOTIFY, REFER, INFO, MESSAGE, UPDATE')
+        self.msg.add_Allow(
+            'INVITE, ACK, CANCEL, OPTIONS, BYE, REGISTER, SUBSCRIBE, NOTIFY, REFER, INFO, MESSAGE, UPDATE')
         self.msg.add_ContentType('application/sdp')
         self.msg.add_Supported('replaces, timer')
 
@@ -113,7 +116,7 @@ class Message3cx:
             if self.call.cur_message.headers.CSeq.method == 'REGISTER':
                 self.msg.add_Contact(
                     f'<sip:{self.call.cur_message.headers.To.account}@{self.call.server_info.host_ip}:{self.call.server_info.sip_port};transport=UDP>;expires=900')
-            elif self.call.cur_message.method_line.method == 'INVITE' or 'CANCEL':
+            elif self.call.cur_message.method_line.method in ['INVITE', 'CANCEL', 'BYE']:
                 self.msg.add_Contact(
                     f'<sip:{self.call.cur_message.headers.To.account}@{self.call.server_info.host_ip}:{self.call.server_info.sip_port}>')
             self.msg.add_To(self.call.cur_message.headers.To, tag=gen_tag())
@@ -125,7 +128,10 @@ class Message3cx:
                     'INVITE, ACK, CANCEL, OPTIONS, BYE, REGISTER, SUBSCRIBE, NOTIFY, REFER, INFO, MESSAGE, UPDATE')
                 self.msg.add_ContentType('application/sdp')
                 self.msg.add_Supported('replaces, timer')
-            self.msg.add_UserAgent('3CXPhoneSystem 18.0.1.234 (234)')
+            if self.call.cur_message.method_line.method == 'BYE':
+                pass
+            else:
+                self.msg.add_UserAgent('3CXPhoneSystem 18.0.1.234 (234)')
             self.msg.add_body(self.body.buf)
             self.msg.build_message()
         elif method == '202':

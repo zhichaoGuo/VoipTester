@@ -22,6 +22,9 @@ class SipMessageBuilder:
     def add_state_line_responses(self, method, cur_message=None):
         self.buf += f'SIP/2.0 {method} {responses_line[method]}' + '\r\n'
 
+    def add_header(self,_key,_value):
+        self.buf += f'{_key}: {_value}\r\n'
+
     def add_Via(self, _via: Via):
         self.buf += 'Via: SIP/2.0/UDP '
         self.buf += f'{_via.ip}' if _via.ip else ''
@@ -53,7 +56,7 @@ class SipMessageBuilder:
         self.buf += f'Call-ID: {buf}'
         self.buf += '\r\n'
 
-    def add_CSeq(self, buf):
+    def add_CSeq(self, buf):  # Todo: add a function let the number add one
         self.buf += f'CSeq: {buf}'
         self.buf += '\r\n'
 
@@ -65,8 +68,8 @@ class SipMessageBuilder:
         self.buf += f'Proxy-Authenticate: {buf}'
         self.buf += '\r\n'
 
-    def add_MaxForwards(self):
-        self.buf += ''
+    def add_MaxForwards(self,buf):
+        self.buf += f'Max-Forwards: {buf}'
         self.buf += '\r\n'
 
     def add_UserAgent(self, buf):
@@ -97,8 +100,8 @@ class SipMessageBuilder:
         self.buf += f'Supported: {_supported}'
         self.buf += '\r\n'
 
-    def add_Subject(self):
-        self.buf += ''
+    def add_Subject(self,_subject='SIP Call'):
+        self.buf += f'Subject: {_subject}\r\n'
 
     def add_Expires(self):
         self.buf += ''

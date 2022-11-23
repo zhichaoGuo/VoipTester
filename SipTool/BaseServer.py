@@ -2,11 +2,13 @@ import select
 import socket
 import time
 from threading import Thread
+from typing import Union
 
 from SipTool.CallInfoManger import CallInfoManger
 from SipTool.MessageParser import SipMessage
 from SipTool.Register import Register
 from SipTool.RtpThread import RtpThread
+from SipTool.SipCall import SipCall
 from SipTool.common.UniqueQueue import UniqueQueue
 
 
@@ -28,6 +30,7 @@ class SipServer:
         self.host_video_port = host_video_port
         self.remote_ip = remote_ip
         self.remote_port = remote_port
+        self.server_info = ServerInfo(remote_ip, host_ip, host_sip_port, host_audio_port, host_video_port)
         # 创建udp socket 并配置复用
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -36,16 +39,15 @@ class SipServer:
         # 配置rtp转发线程
         self.audio_thread = RtpThread(self.host_ip, self.host_audio_port)
         self.video_thread = RtpThread(self.host_ip, self.host_video_port)
+        # 注册信息
+        self.register = Register()
         # 配置call info队列
         self.input = UniqueQueue()
-        self.call_manger = CallInfoManger(self.socket, self.host_ip, self.host_sip_port, self.host_audio_port,
-                                          self.host_video_port)
+        self.call_manger = CallInfoManger(self.socket, self.server_info, self.register)
         # 启动sip应答线程
         self.sip_thread = Thread(target=self.auto_sip)
         self.sip_thread.setDaemon(True)
         self.sip_thread.start()
-        # 注册信息
-        self.register = Register()
 
     def auto_sip(self):
         s_input = [self.socket, ]
@@ -66,7 +68,7 @@ class SipServer:
                     if buf.decode('utf-8') == '\r\n\r\n':
                         continue
                     cur_message = SipMessage(buf)
-                    cur_call = self.call_manger.get_call(cur_message)
+                    cur_call = self.call_manger.get_call(cur_message, dut_port)
                     method = cur_message.method_line.method
                     # 接收处理注册信息：
                     if method == 'REGISTER':
@@ -89,7 +91,7 @@ class SipServer:
                         cur_call.send_message('200')
                         continue
                     elif method == 'OPTION':
-                        continue
+                        cur_call.send_message('200')
 
                     # 打印收到的message
                     print('\r\n↓↓↓↓↓↓↓↓↓↓↓↓↓ rev message from %s:%s ↓↓↓↓↓↓\r\n%s' % (
@@ -105,7 +107,7 @@ class SipServer:
                         else:
                             cur_call.send_message('100')
                             cur_call.send_message('180')
-                    elif method == '180':
+                    elif method == '180':  # Todo: update To tag
                         # do update to tag
                         pass
                     elif method == '200':
@@ -125,12 +127,20 @@ class SipServer:
                         cur_call.send_message('202')
                         cur_call.send_message('notify_trying')
 
-    def send_invite(self, aim_account: str):  # Todo 发起一路新的call
+    def send_invite(self, aim_account: str, use_account: str) -> Union[bool, SipCall]:  # Todo: 发起一路新的call
         if aim_account not in self.register:
             print('[ %s ] is not register!' % aim_account)
             return False
-        cur_call = self.call_manger.gen_call(aim_account)
-        cur_call.send_message('INVITE')
+        return self.call_manger.make_call(aim_account, use_account)
+
+
+class ServerInfo:
+    def __init__(self, remote_ip: str, host_ip: str, sip_port: int, audio_port: int, video_port: int):
+        self.remote_ip = remote_ip
+        self.host_ip = host_ip
+        self.sip_port = sip_port
+        self.audio_port = audio_port
+        self.video_port = video_port
 
 
 class AllCallDict:
@@ -154,5 +164,6 @@ if __name__ == '__main__':
     host_video_port = 12150
     remote_ip = '10.20.1.6'
     remote_port = 5060
-    server = SipServer(host_ip,host_sip_port,host_audio_port,host_video_port,remote_ip,remote_port)
+    server = SipServer(host_ip, host_sip_port, host_audio_port, host_video_port, remote_ip, remote_port)
+    server.call_manger.make_call('1501', '998')
     time.sleep(100)

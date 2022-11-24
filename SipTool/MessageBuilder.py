@@ -4,11 +4,22 @@ responses_line = {'100': 'Trying',
                   '180': 'Ringing',
                   '200': 'OK',
                   '202': 'Accepted',
+                  '301':'Moved Permanently',
+                  '302':'Moved Temporarily',
+                  '305':'Use Proxy',
+                  '400': 'Bad Request',
                   '401': 'Unauthorized',
                   '403': 'Forbidden',
+                  '404': 'Not Found',
                   '407': 'Proxy Authentication Required',
+                  '408': 'Request Timeout',
+                  '481': 'Dialog/Transaction Does Not Exist',
                   '486': 'Busy Here',
-                  '487': 'Request Cancelled'}
+                  '487': 'Request Cancelled',
+                  '500': 'Server Internal Error',
+                  '603': 'Decline',
+                  '606': 'Not Acceptable',
+                  }
 
 
 class SipMessageBuilder:

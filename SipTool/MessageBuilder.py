@@ -17,7 +17,10 @@ class SipMessageBuilder:
         self.buf = ''
 
     def add_state_line_request(self, method, cur_message=None,account=None,ip=None,port=None):
-        self.buf += f'{method} sip:{account}@{ip}:{port};transport=UDP SIP/2.0\r\n'
+        if cur_message:
+            self.buf += f'{method} sip:{account}@{ip}:{port};transport=UDP SIP/2.0\r\n'
+        else:
+            self.buf += f'{method} sip:{account}@{ip}:{port};transport=UDP SIP/2.0\r\n'
 
     def add_state_line_responses(self, method, cur_message=None):
         self.buf += f'SIP/2.0 {method} {responses_line[method]}' + '\r\n'

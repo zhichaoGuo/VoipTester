@@ -1,8 +1,8 @@
 import time
 
 from SipTool.MessageBuilder import SipMessageBuilder, SipBodyBuilder
-from SipTool import SipCall
 from SipTool.ServerInfo import ServerInfo
+from SipTool.SipCall import SipCall
 from SipTool.common.Utils import gen_tag, gen_branch, gen_epid, gen_call_id
 
 
@@ -72,7 +72,17 @@ class Message3cx:
         elif method == 'NOTIFY':
             pass
         elif method == 'ACK':
-            pass
+            self.msg.add_state_line_request('ACK', account=self.call.remote_account,ip=self.call.remote_ip,port=self.call.remote_port)
+            self.msg.add_MaxForwards('70')
+            self.msg.add_Contact(f'<sip:{self.call.cur_message.headers.From.account}@{self.call.server_info.host_ip}:{self.call.server_info.sip_port}>')
+            self.msg.add_To(self.call.cur_message.headers.To)
+            self.msg.add_From(self.call.cur_message.headers.From)
+            self.msg.add_CallId(self.call.cur_message.headers.CallID)
+            self.msg.add_CSeq('1 ACK')
+            self.msg.add_body()
+            self.msg.build_message()
+
+
         elif method == '100':
             self.msg.add_state_line_responses('100')
             self.msg.add_Via(self.call.cur_message.headers.Via)

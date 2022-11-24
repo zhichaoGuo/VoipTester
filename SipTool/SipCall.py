@@ -12,13 +12,14 @@ class SipCall:
     用于承担一路通话的主要责任，包括发送sip信息，确认收取sip信息
     """
 
-    def __init__(self, sip_socket: socket, message: SipMessage, server_info: ServerInfo, remote_port: int):
+    def __init__(self, sip_socket: socket, message: SipMessage, server_info: ServerInfo, remote_port: int,remote_account:str):
         self.socket = sip_socket
         self.sip_message = Message3cx()
         self.cur_message = message
         self.server_info = server_info
         self.remote_ip = server_info.remote_ip
         self.remote_port = remote_port
+        self.remote_account = remote_account
         self.history_message = queue.Queue()
 
     def put(self, message: SipMessage):

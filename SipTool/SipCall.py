@@ -4,7 +4,6 @@ from SipTool.MessageParser import SipMessage
 from socket import socket
 
 from SipTool.ServerInfo import ServerInfo
-from SipTool.SipMessage import Message3cx
 
 
 class SipCall:
@@ -13,6 +12,7 @@ class SipCall:
     """
 
     def __init__(self, sip_socket: socket, message: SipMessage, server_info: ServerInfo, remote_port: int,remote_account:str):
+        from SipTool.SipMessage import Message3cx
         self.socket = sip_socket
         self.sip_message = Message3cx()
         self.cur_message = message

@@ -1,4 +1,5 @@
 from socket import socket
+from typing import Union
 
 from SipTool.MessageParser import SipMessage
 from SipTool.Register import Register
@@ -19,18 +20,22 @@ class CallInfoManger:
         self.dict = {}
         self.all_call_id = set()
 
-    def make_call(self, aim_account: str, use_account: str) -> SipCall:  # Todo: make a new call
+    def make_call(self, aim_account: str, use_account: str) -> Union[bool, SipCall]:  # Todo: make a new call
         remote_port = self.register.query(aim_account)
-        msg = Message3cx().gen_invite_message(aim_account, use_account, self.server_info,remote_port)
-        cur_call = SipCall(self.socket, msg, self.server_info,remote_port,aim_account)
-        self.socket.sendto(msg.encode('utf-8'), (self.server_info.remote_ip,remote_port))
+        if not remote_port:
+            print('%s do not register!' % aim_account)
+            return False
+        msg = Message3cx().gen_invite_message(aim_account, use_account, self.server_info, remote_port)
+        cur_call = SipCall(self.socket, msg, self.server_info, remote_port, aim_account)
+        self.socket.sendto(msg.encode('utf-8'), (self.server_info.remote_ip, remote_port))
         return cur_call
 
     def get_call(self, cur_message: SipMessage, remote_port: int) -> SipCall:
         call_id = cur_message.headers.CallID.call_id
         if call_id not in self.all_call_id:
             self.all_call_id.add(call_id)
-            self.dict[call_id] = SipCall(self.socket, cur_message, self.server_info, remote_port,cur_message.headers.From.account)
+            self.dict[call_id] = SipCall(self.socket, cur_message, self.server_info, remote_port,
+                                         cur_message.headers.From.account)
         else:
             self.dict[call_id].put(cur_message)
         return self.dict[call_id]

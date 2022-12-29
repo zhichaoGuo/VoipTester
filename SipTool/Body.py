@@ -138,7 +138,7 @@ class Body_b(BodyBase):
     eg: b=AS:2098
     """
 
-    def __init__(self, b_list:list):
+    def __init__(self, b_list: list):
         super().__init__(b_list)
 
     def __str__(self):
@@ -319,3 +319,9 @@ class Body_a(BodyBase):
 
     def find_dtmf(self):
         return self.find_codec_by_code(self.dtmf_code)
+
+    def is_hold(self):
+        if self.sendrecv == 'sendonly':
+            return True
+        else:
+            return False

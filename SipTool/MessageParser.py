@@ -33,7 +33,6 @@ class SipMessage:
             header_list = buf_str.split('\\r\\n\\r\\n')[0].split('\\r\\n')[1:]
             body = buf_str.split('\\r\\n\\r\\n')[1]
             if body.find('a=sendonly') != -1:
-                print('123123123123')
                 return True
             else:
                 print('message do not have send only')

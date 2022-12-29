@@ -119,7 +119,10 @@ class Message3cx:
                 self.body.add_a(f'{self.call.cur_message.body.a.find_codec_by_code(match_codec)}')
                 self.body.add_a(f'{self.call.cur_message.body.a.ptime}')
                 self.body.add_a(f'{self.call.cur_message.body.a.find_dtmf()}')
-                self.body.add_a('sendrecv')
+                if self.call.cur_message.is_hold():
+                    self.body.add_a('recvonly')
+                else:
+                    self.body.add_a('sendrecv')
 
             self.msg.add_state_line_responses('200')
             self.msg.add_Via(self.call.cur_message.headers.Via)

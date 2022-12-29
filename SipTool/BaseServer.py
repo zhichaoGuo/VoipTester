@@ -102,6 +102,7 @@ class SipServer:
                         # 放入buf 取得incoming call
                         print('向队列中放入【%s】消息' % method)
                         if cur_message.is_hold():
+                            cur_call.send_message('100')
                             cur_call.send_message('200')
                         elif cur_message.is_resume():
                             cur_call.send_message('200')
@@ -158,6 +159,7 @@ if __name__ == '__main__':
     remote_ip = '10.20.1.6'
     remote_port = 5060
     server = SipServer(host_ip, host_sip_port, host_audio_port, host_video_port, remote_ip, remote_port)
-    time.sleep(5)
-    server.call_manger.make_call('1502', '998')
+    while not server.register.is_register('1501'):
+        time.sleep(1)
+    server.call_manger.make_call('1501', '998')
     time.sleep(100)

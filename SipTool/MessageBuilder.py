@@ -4,9 +4,9 @@ responses_line = {'100': 'Trying',
                   '180': 'Ringing',
                   '200': 'OK',
                   '202': 'Accepted',
-                  '301':'Moved Permanently',
-                  '302':'Moved Temporarily',
-                  '305':'Use Proxy',
+                  '301': 'Moved Permanently',
+                  '302': 'Moved Temporarily',
+                  '305': 'Use Proxy',
                   '400': 'Bad Request',
                   '401': 'Unauthorized',
                   '403': 'Forbidden',
@@ -27,7 +27,7 @@ class SipMessageBuilder:
         self.body = None
         self.buf = ''
 
-    def add_state_line_request(self, method, cur_message=None,account=None,ip=None,port=None):
+    def add_state_line_request(self, method, cur_message=None, account=None, ip=None, port=None):
         if cur_message:
             self.buf += f'{method} sip:{account}@{ip}:{port};transport=UDP SIP/2.0\r\n'
         else:
@@ -36,7 +36,7 @@ class SipMessageBuilder:
     def add_state_line_responses(self, method, cur_message=None):
         self.buf += f'SIP/2.0 {method} {responses_line[method]}' + '\r\n'
 
-    def add_header(self,_key,_value):
+    def add_header(self, _key, _value):
         self.buf += f'{_key}: {_value}\r\n'
 
     def add_Via(self, _via: Via):
@@ -78,11 +78,11 @@ class SipMessageBuilder:
         self.buf += f'Contact: {buf}'
         self.buf += '\r\n'
 
-    def add_ProxyAuthorization(self,buf):
+    def add_ProxyAuthorization(self, buf):
         self.buf += f'Proxy-Authenticate: {buf}'
         self.buf += '\r\n'
 
-    def add_MaxForwards(self,buf):
+    def add_MaxForwards(self, buf):
         self.buf += f'Max-Forwards: {buf}'
         self.buf += '\r\n'
 
@@ -114,7 +114,7 @@ class SipMessageBuilder:
         self.buf += f'Supported: {_supported}'
         self.buf += '\r\n'
 
-    def add_Subject(self,_subject='SIP Call'):
+    def add_Subject(self, _subject='SIP Call'):
         self.buf += f'Subject: {_subject}\r\n'
 
     def add_Expires(self):
@@ -142,7 +142,7 @@ class SipMessageBuilder:
         self.buf += '\r\n\r\n'
 
     def add_body(self, _body=''):
-        self.body = f'{_body}\r\n' if _body else ''
+        self.body = f'{_body}' if _body else ''
 
     def build_message(self):
         self._add_ContentLength()
@@ -195,7 +195,7 @@ class SipBodyBuilder:
         self.buf += f't={_t}\r\n'
 
     def add_m(self, _m):
-        self.buf += f'v={_m}\r\n'
+        self.buf += f'm={_m}\r\n'
 
     def add_a(self, _a):
         self.buf += f'a={_a}\r\n'

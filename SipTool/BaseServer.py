@@ -116,11 +116,11 @@ class SipServer:
                         if cur_message.headers.CSeq.method == 'INVITE':
                             cur_call.send_message('ACK')
                     elif method == '302':
-                        cur_call.send_message('ack_invite')
+                        cur_call.send_message('ACK')
                     elif method == '486':
-                        cur_call.send_message('ack_invite')
+                        cur_call.send_message('ACK')
                     elif method == '487':
-                        cur_call.send_message('ack_487')
+                        cur_call.send_message('ACK')
                     elif method == 'CANCEL':
                         cur_call.send_message('200')
                     elif method == 'BYE':

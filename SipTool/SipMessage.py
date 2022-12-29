@@ -47,7 +47,7 @@ class Message3cx:
         self.msg.add_ContentType('application/sdp')
         self.msg.add_Supported('replaces, timer')
 
-        self.msg.add_body()
+        self.msg.add_body(self.body.buf)
         return self.msg.build_message()
 
     def gen_message(self, call: SipCall, method):  # Todo: build all call message
@@ -73,6 +73,7 @@ class Message3cx:
             pass
         elif method == 'ACK':
             self.msg.add_state_line_request('ACK', account=self.call.remote_account,ip=self.call.remote_ip,port=self.call.remote_port)
+            self.msg.add_Via(self.call.cur_message.headers.Via)
             self.msg.add_MaxForwards('70')
             self.msg.add_Contact(f'<sip:{self.call.cur_message.headers.From.account}@{self.call.server_info.host_ip}:{self.call.server_info.sip_port}>')
             self.msg.add_To(self.call.cur_message.headers.To)

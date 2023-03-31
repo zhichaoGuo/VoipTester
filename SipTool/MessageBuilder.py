@@ -1,4 +1,4 @@
-from SipTool.Herder import Via, From, To
+from SipTool.SipHeader import Via, From, To
 
 responses_line = {'100': 'Trying',
                   '180': 'Ringing',
@@ -86,7 +86,7 @@ class SipMessageBuilder:
         self.buf += f'Max-Forwards: {buf}'
         self.buf += '\r\n'
 
-    def add_UserAgent(self, buf):
+    def add_UserAgent(self, buf='VoipTester'):
         self.buf += f'User-Agent: {buf}'
         self.buf += '\r\n'
 

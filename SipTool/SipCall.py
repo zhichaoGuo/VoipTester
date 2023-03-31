@@ -1,9 +1,9 @@
 import queue
 
-from SipTool.MessageParser import SipMessage
 from socket import socket
 
 from SipTool.ServerInfo import ServerInfo
+from SipTool.SipMessage import SipMessage
 
 
 class SipCall:
@@ -11,7 +11,8 @@ class SipCall:
     用于承担一路通话的主要责任，包括发送sip信息，确认收取sip信息
     """
 
-    def __init__(self, sip_socket: socket, message: SipMessage, server_info: ServerInfo, remote_port: int,remote_account:str):
+    def __init__(self, sip_socket: socket, message: SipMessage, server_info: ServerInfo, remote_port: int,
+                 remote_account: str):
         from SipTool.SipMessage import Message3cx
         self.socket = sip_socket
         self.sip_message = Message3cx()

@@ -1,7 +1,7 @@
 import re
 
 
-class Body:
+class SdpBody:
     def __init__(self, buf: str):
         sdp_list = buf.split('\r\n')
         body_a_list = []

@@ -179,11 +179,12 @@ class Contact(HeaderLine):
     Contact: <sip:1501@10.20.0.14:5060>
     """
     def __init__(self, buf):
-        attr_list = ['account','ip','port']
+        attr_list = ['account','ip','port','transport']
         self.account = None
         self.ip = None
         self.port = None
-        re_tpl_list = [r'<sip:(?P<account>.+)@(?P<ip>.+):(?P<port>[0-9]{1,6});transport=UDP>',
+        self.transport = None
+        re_tpl_list = [r'<sip:(?P<account>.+)@(?P<ip>.+):(?P<port>[0-9]{1,6});transport=(?P<transport>.+)>',
                        r'<sip:(?P<account>.+)@(?P<ip>.+):(?P<port>[0-9]{1,6})>']
         super().__init__(buf, attr_list, re_tpl_list)
 

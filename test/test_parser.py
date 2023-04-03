@@ -1,5 +1,5 @@
 from SipTool.MessageParser import parser_buf
-from SipTool.SipHeader import Via, From, To, CallID
+from SipTool.SipHeader import Via, From, To, CallID, CSeq, Contact
 from test.DemoBuffer import REV
 
 
@@ -65,12 +65,36 @@ class TestParser:
             assert demo.port == hope[i][2]
             assert demo.tag == hope[i][3]
             assert demo.epid == hope[i][4]
+
     def test_call_id(self):
         call_id = ['ae8dfd2bc1bdf54@10.20.0.29']
         hope = [['ae8dfd2bc1bdf54@10.20.0.29']]
         for i in range(len(call_id)):
             demo = CallID(call_id[i])
             assert demo.call_id == hope[i][0]
+
+    def test_cseq(self):
+        cseq = ['21 INVITE']
+        hope = [['21','INVITE']]
+        for i in range(len(cseq)):
+            demo = CSeq(cseq[i])
+            assert demo.number == hope[i][0]
+            assert demo.method == hope[i][1]
+
+    def test_contact(self):
+        contact = ['<sip:1501@10.20.0.14:5060;transport=UDP>',
+                   '<sip:1501@10.20.0.14:5060>']
+        hope = [['1501','10.20.0.14','5060','UDP'],
+                ['1501','10.20.0.14','5060',None]]
+        for i in range(len(contact)):
+            demo = Contact(contact)
+            assert demo.account == hope[i][0]
+            assert demo.ip == hope[i][1]
+            assert demo.port == hope[i][2]
+            assert demo.transport == hope[i][3]
+
+
+
 
 if __name__ == '__main__':
     test = TestParser()

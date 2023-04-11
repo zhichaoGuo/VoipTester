@@ -166,7 +166,7 @@ class CSeq(HeaderLine):
     CSeq: 21 INVITE
     """
     def __init__(self, buf):
-        attr_list = ['call_id']
+        attr_list = ['number', 'method']
         self.number = None
         self.method = None
         re_tpl_list = [r'(?P<number>[0-9]{1,6}) (?P<method>.+)']

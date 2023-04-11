@@ -4,6 +4,7 @@ from socket import socket
 
 from SipTool.ServerInfo import ServerInfo
 from SipTool.SipMessage import SipMessage
+from SipTool.common.LogInfo import print_send_buf
 
 
 class SipCall:
@@ -35,6 +36,5 @@ class SipCall:
         self._send(self.sip_message.gen_message(self, method))
 
     def _send(self, buf):
-        print('send message to %s:%s' % (self.remote_ip, int(self.remote_port)))
-        print(buf)
+        print_send_buf(self.remote_ip, int(self.remote_port),buf)
         self.socket.sendto(buf.encode(encoding='utf-8'), (self.remote_ip, int(self.remote_port)))

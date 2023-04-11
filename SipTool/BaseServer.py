@@ -5,11 +5,12 @@ from threading import Thread
 from typing import Union
 
 from SipTool.CallInfoManger import CallInfoManger
-from SipTool.MessageParser import SipMessage
+from SipTool.MessageParser import parser_buf
 from SipTool.Register import Register
 from SipTool.RtpThread import RtpThread
 from SipTool.ServerInfo import ServerInfo
 from SipTool.SipCall import SipCall
+from SipTool.common.LogInfo import print_rev_buf
 from SipTool.common.UniqueQueue import UniqueQueue
 
 
@@ -54,7 +55,7 @@ class SipServer:
         s_input = [self.socket, ]
         s_output = []
         while True:
-            readable, writeable, exeptional = select.select(s_input, s_output, s_input)
+            readable, writeable, exeptional = select.select(s_input, s_output, s_input, 1)
             # 读取数据
             for s in readable:  # 每个s就是一个socket
                 if s is self.socket:
@@ -68,7 +69,7 @@ class SipServer:
                     # 跳过空行
                     if buf.decode('utf-8') == '\r\n\r\n':
                         continue
-                    cur_message = SipMessage(buf)
+                    cur_message = parser_buf(buf)
                     cur_call = self.call_manger.get_call(cur_message, dut_port)
                     method = cur_message.method_line.method
                     # 接收处理注册信息：
@@ -95,9 +96,7 @@ class SipServer:
                         cur_call.send_message('200')
 
                     # 打印收到的message
-                    print('\r\n↓↓↓↓↓↓↓↓↓↓↓↓↓ rev message from %s:%s ↓↓↓↓↓↓\r\n%s' % (
-                        dut_ip, dut_port, buf.decode('utf-8')))
-                    print('↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑\r\n')
+                    print_rev_buf(dut_ip, dut_port, buf)
                     if method == 'INVITE':
                         # 放入buf 取得incoming call
                         print('向队列中放入【%s】消息' % method)
@@ -105,6 +104,7 @@ class SipServer:
                             cur_call.send_message('100')
                             cur_call.send_message('200')
                         elif cur_message.is_resume():
+                            cur_call.send_message('100')
                             cur_call.send_message('200')
                         else:
                             cur_call.send_message('100')
@@ -141,7 +141,7 @@ class AllCallDict:
         self.dict = {}
         self.all_call_id = set()
 
-    def add(self, cur_message: SipMessage):
+    def add(self, cur_message):
         call_id = cur_message.headers.CallID.call_id
         if call_id not in self.all_call_id:
             self.all_call_id.add(call_id)

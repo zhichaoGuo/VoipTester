@@ -1,11 +1,10 @@
 from socket import socket
 from typing import Union
 
-from SipTool.MessageParser import SipMessage
 from SipTool.Register import Register
 from SipTool.ServerInfo import ServerInfo
 from SipTool.SipCall import SipCall
-from SipTool.SipMessage import Message3cx
+from SipTool.SipMessage import Message3cx, SipMessage
 
 
 class CallInfoManger:
@@ -32,6 +31,7 @@ class CallInfoManger:
 
     def get_call(self, cur_message: SipMessage, remote_port: int) -> SipCall:
         call_id = cur_message.headers.CallID.call_id
+        # 是新的一路call id，创建sip call
         if call_id not in self.all_call_id:
             self.all_call_id.add(call_id)
             self.dict[call_id] = SipCall(self.socket, cur_message, self.server_info, remote_port,

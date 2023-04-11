@@ -6,10 +6,10 @@ from test.DemoBuffer import REV
 class TestParser:
 
     def test_method(self):
-        sip_message = parser_buf(REV.Invite)
+        sip_message = parser_buf(REV.video.Invite)
         assert sip_message.method_line.method == 'INVITE'
         assert sip_message.method_line.is_responses is False
-        sip_message = parser_buf(REV.m_100)
+        sip_message = parser_buf(REV.audio.m_100)
         assert sip_message.method_line.method == '100'
         assert sip_message.method_line.is_responses is True
 
@@ -75,7 +75,7 @@ class TestParser:
 
     def test_cseq(self):
         cseq = ['21 INVITE']
-        hope = [['21','INVITE']]
+        hope = [['21', 'INVITE']]
         for i in range(len(cseq)):
             demo = CSeq(cseq[i])
             assert demo.number == hope[i][0]
@@ -84,16 +84,14 @@ class TestParser:
     def test_contact(self):
         contact = ['<sip:1501@10.20.0.14:5060;transport=UDP>',
                    '<sip:1501@10.20.0.14:5060>']
-        hope = [['1501','10.20.0.14','5060','UDP'],
-                ['1501','10.20.0.14','5060',None]]
+        hope = [['1501', '10.20.0.14', '5060', 'UDP'],
+                ['1501', '10.20.0.14', '5060', None]]
         for i in range(len(contact)):
             demo = Contact(contact)
             assert demo.account == hope[i][0]
             assert demo.ip == hope[i][1]
             assert demo.port == hope[i][2]
             assert demo.transport == hope[i][3]
-
-
 
 
 if __name__ == '__main__':

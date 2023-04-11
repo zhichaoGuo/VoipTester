@@ -134,8 +134,9 @@ class To(HeaderLine):
     To: <sip:1500@192.168.0.68>;tag=7a7c8b24
     To: <sip:1500@192.168.0.68>
     """
+
     def __init__(self, buf):
-        attr_list = ['account','ip','port','tag','epid']
+        attr_list = ['account', 'ip', 'port', 'tag', 'epid']
         self.account = None
         self.ip = None
         self.port = None
@@ -153,6 +154,7 @@ class CallID(HeaderLine):
     """
     Call-ID: ae8dfd2bc1bdf54@10.20.0.29
     """
+
     def __init__(self, buf):
         attr_list = ['call_id']
         self.call_id = buf
@@ -160,11 +162,11 @@ class CallID(HeaderLine):
         super().__init__(buf, attr_list, re_tpl_list)
 
 
-
 class CSeq(HeaderLine):
     """
     CSeq: 21 INVITE
     """
+
     def __init__(self, buf):
         attr_list = ['number', 'method']
         self.number = None
@@ -178,8 +180,9 @@ class Contact(HeaderLine):
     Contact: <sip:1501@10.20.0.14:5060;transport=UDP>
     Contact: <sip:1501@10.20.0.14:5060>
     """
+
     def __init__(self, buf):
-        attr_list = ['account','ip','port','transport']
+        attr_list = ['account', 'ip', 'port', 'transport']
         self.account = None
         self.ip = None
         self.port = None

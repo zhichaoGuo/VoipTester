@@ -242,6 +242,9 @@ class SipRequest(SipMessage):
         else:
             return True
 
+    def is_authorization(self):
+        return hasattr(self.headers, 'ProxyAuthorization')
+
 
 class SipResponse(SipMessage):
     def __init__(self, buf: bytes):

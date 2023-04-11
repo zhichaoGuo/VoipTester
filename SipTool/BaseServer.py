@@ -74,7 +74,7 @@ class SipServer:
                     method = cur_message.method_line.method
                     # 接收处理注册信息：
                     if method == 'REGISTER':
-                        if cur_message.headers.CSeq.number == '1':
+                        if not cur_message.is_authorization():
                             cur_call.send_message('407')
                             continue
                         else:

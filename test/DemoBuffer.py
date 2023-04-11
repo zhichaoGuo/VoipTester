@@ -20,6 +20,7 @@ class RevDemo:
                 b'Call-ID: ae8dfd2bc1bdf54@10.20.0.29\r\n' \
                 b'CSeq: 2 REGISTER\r\n' \
                 b'Contact: <sip:1501@10.20.0.29:5060;transport=UDP>\r\n' \
+                b'Proxy-Authorization: Digest username="1503", realm="3CXPhoneSystem", nonce="414d535c1a45905515:9dae2ca4b9daf6c5ecef70b9f62b3b7c", uri="sip:192.168.0.68:5060", response="3cfeb06b0a7eab27562a58a3f57d2001", algorithm=MD5\r\n' \
                 b'Max-Forwards: 70\r\n' \
                 b'Supported: path\r\n' \
                 b'User-Agent: IPPHONE    V2.23.3.29.488 001fc11f34be\r\n' \

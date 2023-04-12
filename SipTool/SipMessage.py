@@ -4,13 +4,12 @@ from SipTool.MessageBuilder import SipMessageBuilder, SipBodyBuilder
 from SipTool.SdpBody import SdpBody
 from SipTool.ServerInfo import ServerInfo
 
-from SipTool.SipHeader import SipHeader
+from SipTool.SipHeader import SipHeader, To, From
 from SipTool.SipMethodLine import MethodLine
 from SipTool.common.Utils import gen_tag, gen_branch, gen_epid, gen_call_id
 
 
 class Message3cx:
-
     """
     用于确定sip包格式
     """
@@ -64,12 +63,21 @@ class Message3cx:
             pass
 
         elif method == 'BYE':
-            self.msg.add_state_line_request('BYE', call)
-            self.msg.add_Via(self.call.cur_message.headers.Via)
-            self.msg.add_To(self.call.cur_message.headers.To)
-            self.msg.add_From(self.call.cur_message.headers.From)
+            self.msg.add_state_line_request('BYE', call, account=self.call.remote_account, ip=self.call.remote_ip,
+                                            port=self.call.remote_port)
+            _via = self.call.cur_message.headers.Via
+            _via.ip = self.call.server_info.host_ip
+            _via.port = self.call.server_info.sip_port
+            self.msg.add_Via(_via)
+            if self.call.cur_message.headers.To.account == self.call.remote_account:
+                self.msg.add_To(self.call.cur_message.headers.To)
+                self.msg.add_From(self.call.cur_message.headers.From)
+            else:
+                self.msg.add_To(To(self.call.cur_message.headers.From.buf))
+                self.msg.add_From(From(self.call.cur_message.headers.To.buf))
             self.msg.add_CallId(self.call.cur_message.headers.CallID)
-            self.msg.add_CSeq(self.call.cur_message.headers.CSeq)
+            self.msg.add_CSeq('2 BYE')
+            self.msg.add_UserAgent('3CXPhoneSystem 18.0.7.312 (312)')
             self.msg.add_body()
             self.msg.build_message()
 
@@ -104,11 +112,13 @@ class Message3cx:
             self.msg.build_message()
 
         elif method == '180':
+            # update tag to cur call message
+            self.call.cur_message.headers.To.update_tag(self.call.tag)
             self.msg.add_state_line_responses('180')
             self.msg.add_Via(self.call.cur_message.headers.Via)
             self.msg.add_Contact(
                 f'<sip:{self.call.cur_message.headers.To.account}@{self.call.server_info.host_ip}:{self.call.server_info.sip_port}>')
-            self.msg.add_To(self.call.cur_message.headers.To, tag=gen_tag())
+            self.msg.add_To(self.call.cur_message.headers.To, tag=self.call.tag)
             self.msg.add_From(self.call.cur_message.headers.From)
             self.msg.add_CallId(self.call.cur_message.headers.CallID)
             self.msg.add_CSeq(self.call.cur_message.headers.CSeq)
@@ -143,7 +153,7 @@ class Message3cx:
             elif self.call.cur_message.method_line.method in ['INVITE', 'CANCEL', 'BYE']:
                 self.msg.add_Contact(
                     f'<sip:{self.call.cur_message.headers.To.account}@{self.call.server_info.host_ip}:{self.call.server_info.sip_port}>')
-            self.msg.add_To(self.call.cur_message.headers.To, tag=gen_tag())
+            self.msg.add_To(self.call.cur_message.headers.To, tag=self.call.tag)
             self.msg.add_From(self.call.cur_message.headers.From)
             self.msg.add_CallId(self.call.cur_message.headers.CallID)
             self.msg.add_CSeq(self.call.cur_message.headers.CSeq.buf)
@@ -153,9 +163,9 @@ class Message3cx:
                 self.msg.add_ContentType('application/sdp')
                 self.msg.add_Supported('replaces, timer')
             if self.call.cur_message.method_line.method == 'BYE':
-                pass
+                self.msg.add_UserAgent('3CXPhoneSystem 18.0.7.312 (312)')
             else:
-                self.msg.add_UserAgent('3CXPhoneSystem 18.0.1.234 (234)')
+                self.msg.add_UserAgent('3CXPhoneSystem 18.0.7.312 (312)')
             self.msg.add_body(self.body.buf)
             self.msg.build_message()
 
@@ -191,6 +201,7 @@ class SipMessage:
     sip message
     分为三个部分：method_line，headers，body
     """
+
     def __init__(self, buf: bytes):
         self.buf = buf
         buf_str = buf.decode('utf-8')

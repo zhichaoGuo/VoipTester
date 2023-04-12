@@ -25,7 +25,8 @@ class SipServer:
                  host_audio_port: int,
                  host_video_port: int,
                  remote_ip: str = None,
-                 remote_port: int = None):
+                 remote_port: int = None,
+                 debug=False):
         self.host_ip = host_ip
         self.host_sip_port = host_sip_port
         self.host_audio_port = host_audio_port
@@ -37,10 +38,11 @@ class SipServer:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.setblocking(True)
-        self.socket.bind((host_ip, host_sip_port))
-        # 配置rtp转发线程
-        self.audio_thread = RtpThread(self.host_ip, self.host_audio_port)
-        self.video_thread = RtpThread(self.host_ip, self.host_video_port)
+        if not debug:
+            self.socket.bind((host_ip, host_sip_port))
+            # 配置rtp转发线程
+            self.audio_thread = RtpThread(self.host_ip, self.host_audio_port)
+            self.video_thread = RtpThread(self.host_ip, self.host_video_port)
         # 注册信息
         self.register = Register()
         # 配置call info队列
@@ -135,19 +137,6 @@ class SipServer:
             return False
         return self.call_manger.make_call(aim_account, use_account)
 
-
-class AllCallDict:
-    def __init__(self):
-        self.dict = {}
-        self.all_call_id = set()
-
-    def add(self, cur_message):
-        call_id = cur_message.headers.CallID.call_id
-        if call_id not in self.all_call_id:
-            self.all_call_id.add(call_id)
-        else:
-            self.dict[call_id].put(cur_message)
-        return self.dict[call_id]
 
 
 if __name__ == '__main__':

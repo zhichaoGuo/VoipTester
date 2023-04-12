@@ -30,6 +30,12 @@ class CallInfoManger:
         return cur_call
 
     def get_call(self, cur_message: SipMessage, remote_port: int) -> SipCall:
+        """
+        从集合中取出cur message相同call id的sip call，如果没有则新建一个
+        :param cur_message:
+        :param remote_port:
+        :return:
+        """
         call_id = cur_message.headers.CallID.call_id
         # 是新的一路call id，创建sip call
         if call_id not in self.all_call_id:

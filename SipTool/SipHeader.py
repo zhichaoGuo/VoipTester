@@ -149,6 +149,16 @@ class To(HeaderLine):
                        r'<sip:(?P<account>.+)@(?P<ip>.+)>']
         super().__init__(buf, attr_list, re_tpl_list)
 
+    def update_tag(self, tag):
+        add = f';tag={tag}'
+        if self.tag:
+            if self.epid:
+                add += f';epid={self.epid}'
+            self.buf = self.buf.split(';tag=')[0] + add
+        else:
+            self.buf += add
+        self.tag = tag
+
 
 class CallID(HeaderLine):
     """

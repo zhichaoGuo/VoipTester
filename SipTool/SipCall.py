@@ -5,6 +5,7 @@ from socket import socket
 from SipTool.ServerInfo import ServerInfo
 from SipTool.SipMessage import SipMessage
 from SipTool.common.LogInfo import print_send_buf
+from SipTool.common.Utils import gen_tag
 
 
 class SipCall:
@@ -23,15 +24,34 @@ class SipCall:
         self.remote_port = remote_port
         self.remote_account = remote_account
         self.history_message = queue.Queue()
+        self.tag = gen_tag()
 
     def put(self, message: SipMessage):
+        """
+        将sip message加入历史记录中，并更新cur message
+        :param message:
+        :return:
+        """
         self.history_message.put(self.cur_message)
         self.cur_message = message
 
     def rev_message(self, method):  # Todo 完善rev机制
         pass
 
+    def gen_message(self,method: str):
+        """
+        用于测试生成message是否正确，通常在程序中不使用
+        :param method:
+        :return:
+        """
+        return self.sip_message.gen_message(self, method)
+
     def send_message(self, method: str):
+        """
+        发送sip消息
+        :param method:期待生成的sip消息的method
+        :return:
+        """
         print('send [ %s ] message' % method)
         self._send(self.sip_message.gen_message(self, method))
 

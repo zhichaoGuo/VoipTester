@@ -15,10 +15,11 @@ class SipCall:
 
     def __init__(self, sip_socket: socket, message: SipMessage, server_info: ServerInfo, remote_port: int,
                  remote_account: str):
-        from SipTool.SipMessage import Message3cx
+        from SipTool.SipMessageFormat import Format3cx
         self.socket = sip_socket
-        self.sip_message = Message3cx()
+        self.sip_message_format = Format3cx()
         self.cur_message = message
+        self.call_id = message.headers.CallID
         self.server_info = server_info
         self.remote_ip = server_info.remote_ip
         self.remote_port = remote_port
@@ -38,13 +39,13 @@ class SipCall:
     def rev_message(self, method):  # Todo 完善rev机制
         pass
 
-    def gen_message(self,method: str):
+    def gen_message(self, method: str):
         """
         用于测试生成message是否正确，通常在程序中不使用
         :param method:
         :return:
         """
-        return self.sip_message.gen_message(self, method)
+        return self.sip_message_format.gen_message(self, method)
 
     def send_message(self, method: str):
         """
@@ -53,8 +54,8 @@ class SipCall:
         :return:
         """
         print('send [ %s ] message' % method)
-        self._send(self.sip_message.gen_message(self, method))
+        self._send(self.sip_message_format.gen_message(self, method))
 
     def _send(self, buf):
-        print_send_buf(self.remote_ip, int(self.remote_port),buf)
+        print_send_buf(self.remote_ip, int(self.remote_port), buf)
         self.socket.sendto(buf.encode(encoding='utf-8'), (self.remote_ip, int(self.remote_port)))

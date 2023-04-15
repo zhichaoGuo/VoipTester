@@ -4,7 +4,10 @@ from test.DemoBuffer import REV
 
 
 class TestParser:
-
+    """
+    1. 测试parser_buf的method、is_responses是否正确
+    2. 测试via、form、to、call id、cseq、contact解析是否正确
+    """
     def test_method(self):
         sip_message = parser_buf(REV.video.Invite)
         assert sip_message.method_line.method == 'INVITE'

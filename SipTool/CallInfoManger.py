@@ -4,7 +4,8 @@ from typing import Union
 from SipTool.Register import Register
 from SipTool.ServerInfo import ServerInfo
 from SipTool.SipCall import SipCall
-from SipTool.SipMessage import Message3cx, SipMessage
+from SipTool.SipMessage import SipMessage
+from SipTool.SipMessageFormat import Format3cx
 
 
 class CallInfoManger:
@@ -24,7 +25,7 @@ class CallInfoManger:
         if not remote_port:
             print('%s do not register!' % aim_account)
             return False
-        msg = Message3cx().gen_invite_message(aim_account, use_account, self.server_info, remote_port)
+        msg = Format3cx().gen_invite_message(aim_account, use_account, self.server_info, remote_port)
         cur_call = SipCall(self.socket, msg, self.server_info, remote_port, aim_account)
         self.socket.sendto(msg.encode('utf-8'), (self.server_info.remote_ip, remote_port))
         return cur_call
@@ -46,5 +47,11 @@ class CallInfoManger:
             self.dict[call_id].put(cur_message)
         return self.dict[call_id]
 
-    def remove_call(self, cur_message: SipMessage) -> bool:  # Todo: 实现去除call
-        pass
+    def remove_call(self, call_id: str) -> bool:  # Todo: 实现去除call
+        try:
+            self.dict.pop(call_id)
+            self.all_call_id.remove(call_id)
+            return True
+        except Exception as err:
+            print(err)
+            return False

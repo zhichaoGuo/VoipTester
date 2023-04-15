@@ -121,12 +121,16 @@ class SipServer:
                         cur_call.send_message('ACK')
                     elif method == '486':
                         cur_call.send_message('ACK')
+                        self.call_manger.remove_call(cur_call.call_id)
                     elif method == '487':
                         cur_call.send_message('ACK')
+                        self.call_manger.remove_call(cur_call.call_id)
                     elif method == 'CANCEL':
                         cur_call.send_message('200')
+                        self.call_manger.remove_call(cur_call.call_id)
                     elif method == 'BYE':
                         cur_call.send_message('200')
+                        self.call_manger.remove_call(cur_call.call_id)
                     elif method == 'REFER':
                         cur_call.send_message('202')
                         cur_call.send_message('notify_trying')

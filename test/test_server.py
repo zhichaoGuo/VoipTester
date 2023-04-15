@@ -198,10 +198,12 @@ class TestDutInvite:
         assert str(gen_msg.headers.UserAgent) == str(hope_msg.headers.UserAgent)
 
     def test_gen_bye(self):
+        self.test_gen_100()
+        self.test_gen_180()
+        self.test_gen_200invite()
         msg = self.server.call_manger.get_call(self.input_msg, 5060).gen_message('BYE')
         gen_msg = parser_buf(msg.encode('utf-8'))
         hope_msg = parser_buf(SERVER.Bye)
-        print(msg)
         assert str(gen_msg.method_line) == str(hope_msg.method_line)
         assert str(gen_msg.headers.Via.ip) == str(hope_msg.headers.Via.ip)
         assert str(gen_msg.headers.Via.port) == str(hope_msg.headers.Via.port)
@@ -214,7 +216,9 @@ class TestDutInvite:
         assert str(gen_msg.headers.UserAgent) == str(hope_msg.headers.UserAgent)
 
     def test_gen_100hold(self):
-        pass
+        self.test_gen_100()
+        self.test_gen_180()
+        self.test_gen_200invite()
 
     def test_gen_200hold(self):
         pass

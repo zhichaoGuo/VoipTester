@@ -5,6 +5,7 @@ from threading import Thread
 class RtpThread:
     """
     rtp转发线程，初始化时应申请本地rtp接收端口和解析出远端rtp接收端口
+    在master分支中使用回环，而不使用pyav发送音视频
     """
 
     def __init__(self, host_ip: str, rtp_port: int):

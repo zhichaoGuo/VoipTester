@@ -54,6 +54,7 @@ class SipServer:
         self.sip_thread.start()
 
     def auto_sip(self):
+        """应答线程"""
         s_input = [self.socket, ]
         s_output = []
         while True:
@@ -140,7 +141,6 @@ class SipServer:
             print('[ %s ] is not register!' % aim_account)
             return False
         return self.call_manger.make_call(aim_account, use_account)
-
 
 
 if __name__ == '__main__':

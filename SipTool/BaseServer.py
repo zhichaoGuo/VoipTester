@@ -18,7 +18,6 @@ class SipServer:
     """
     用于接收sip消息，实现sip 通信
     """
-
     def __init__(self,
                  host_ip: str,
                  host_sip_port: int,
